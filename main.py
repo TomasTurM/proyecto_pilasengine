@@ -1,6 +1,5 @@
 # Importo Pilas Engine
 import pilasengine
-from math import atan
 
 # Inicializo Pilas Engine
 pilas = pilasengine.iniciar()
@@ -13,15 +12,20 @@ class balitas(pilasengine.actores.Actor):
         self.imagen = pilas.imagenes.cargar('src/img/personaje.png')
         
         # Habilidades de Bala
-        self.aprender('eliminarsesisaledepantalla')
+        self.aprender('eliminarsesisaledepantalla')    
+        self.aprender('puedeexplotar')
+       
+    def eliminar(self):
+        self.eliminar()
         
         
 pilas.actores.vincular(balitas)
 
 # Personaje
 class personaje(pilasengine.actores.Actor):
-    
+     
     def iniciar(self):
+
         # Controles
         teclas = {
         pilas.simbolos.a: 'izquierda',
@@ -59,47 +63,94 @@ class personaje(pilasengine.actores.Actor):
     
 pilas.actores.vincular(personaje)
 
-
 # NPC (Zombies)
 class zombie(pilasengine.actores.Actor):
-
+    
     def iniciar(self):
+
         self.x = 250
         self.y = 100
         self.radio_de_colision = 25
         #self.imagen = pilasengine.actores.actor.Actor.obtener_imagen(pilasengine.actores.Aceituna())
         
         # Hablilidades Zombie
-        #self.aprender('seguirclicks')
-    
+        self.aprender('puedeexplotar')
+     
+ 
     def actualizar(self):
         pass
-        #self.x = self.personaje.x
-        #self.y = self.personaje.y
     
-    def calc_trayecto(self, x2, y2):
-        m1 = y2 - self.y
-        m2 = x2 - self.x
+    def eliminar(self):
+        self.eliminar()
         
-        return (atan(m1/m2))
+    #Seguir Jugador
+    def seguir_jugador(self, personaje):
+       self.x = [personaje.x],5
+       self.y = [personaje.y],5   
         
         
-           
-
 pilas.actores.vincular(zombie)
 
 
+class zombie_spawn (pilasengine.actores.actor_invisible.ActorInvisible):
+    
+    def iniciar(self):
+        self.x = 200
+        self.y = 200
+        
+    def spawn(self, z):
+        
+        enemigos = pilas.actores.Grupo()
+        enemigos.agregar(z)
+     
+        z.x = pilas.azar(-200, 200)
+        z.y = pilas.azar(-200, 200) 
+        
+        
+pilas.actores.vincular(zombie_spawn)
+
+            
+class escena_juego(pilasengine.escenas.Escena):
+    
+    def iniciar(self):
+        # Invocacion Spawn
+        self.zombie_spawn = pilas.actores.zombie_spawn()
+        
+        # Invocacion de Personaje
+        self.personaje = pilas.actores.personaje()
+
+        # Invocacion de Zombie
+        self.zombie = pilas.actores.zombie()
+        
+        pilas.colisiones.agregar("balitas", "zombie", self.hit_zombie)
+        
+        # Spawn
+        pilas.tareas.siempre(2, self.spawnYseguir)
+        
+        
+    def hit_zombie(self, zombie, balitas):
+        
+        balitas.eliminar()
+        zombie.eliminar() 
+        
+    def spawnYseguir (self):
+        
+        z = pilas.actores.zombie()
+        self.zombie_spawn.spawn(z)
+        pilas.tareas.siempre(0, z.seguir_jugador(self.personaje))
+        
+        
+        
+     
+               
+pilas.escenas.vincular(escena_juego)
+           
+pilas.escenas.escena_juego()
 
 
 
-# Invocacion de Personaje
-personaje = pilas.actores.personaje()
-
-# Invocacion de Zombie
-zombie = pilas.actores.zombie()
 
 
-print(zombie.calc_trayecto(personaje.x, personaje.y))
 
 
 
