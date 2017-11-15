@@ -66,6 +66,9 @@ pilas.actores.vincular(personaje)
 # NPC (Zombies)
 class zombie(pilasengine.actores.Actor):
     
+    def __init__(self, actor):
+        self.actor = actor
+    
     def iniciar(self):
 
         self.x = 250
@@ -75,18 +78,17 @@ class zombie(pilasengine.actores.Actor):
         
         # Hablilidades Zombie
         self.aprender('puedeexplotar')
-     
- 
-    def actualizar(self):
-        pass
     
     def eliminar(self):
         self.eliminar()
         
     #Seguir Jugador
-    def seguir_jugador(self, personaje):
-       self.x = [personaje.x],5
-       self.y = [personaje.y],5   
+    def seguir_jugador(self):
+       self.x = [self.actor.x],5
+       self.y = [self.actor.y],5   
+            
+    def actualizar(self):
+        self.seguir_jugador()
         
         
 pilas.actores.vincular(zombie)
@@ -94,14 +96,15 @@ pilas.actores.vincular(zombie)
 
 class zombie_spawn (pilasengine.actores.actor_invisible.ActorInvisible):
     
+    enemigos = pilas.actores.Grupo()
+    
     def iniciar(self):
         self.x = 200
         self.y = 200
         
-    def spawn(self, z):
+    def spawn(self, z, actor):
         
-        enemigos = pilas.actores.Grupo()
-        enemigos.agregar(z)
+        self.enemigos.agregar(z)
      
         z.x = pilas.azar(-200, 200)
         z.y = pilas.azar(-200, 200) 
@@ -133,11 +136,11 @@ class escena_juego(pilasengine.escenas.Escena):
         balitas.eliminar()
         zombie.eliminar() 
         
-    def spawnYseguir (self):
+    def spawnYseguir (self, personaje):
         
-        z = pilas.actores.zombie()
+        z = pilas.actores.zombie(personaje)
         self.zombie_spawn.spawn(z)
-        pilas.tareas.siempre(0, z.seguir_jugador(self.personaje))
+        
         
         
         
