@@ -10,7 +10,8 @@ class balitas(pilasengine.actores.Actor):
         # Propiedades de Bala
         self.radio_de_colision = 5
         self.figura_balita = self.pilas.fisica.Circulo(0, 0, 5, dinamica=False, sensor=False)
-        self.imagen = pilas.imagenes.cargar('src/img/personaje.png')
+        self.imagen = pilas.imagenes.cargar('src/img/bullet_v2.png')
+        self.espejado = True
         
         # Habilidades de Bala
         self.aprender('eliminarsesisaledepantalla')    
@@ -36,8 +37,6 @@ class personaje(pilasengine.actores.Actor):
         teclas = {
         pilas.simbolos.a: 'izquierda',
         pilas.simbolos.d: 'derecha',
-        #pilas.simbolos.w: 'arriba',
-        #pilas.simbolos.s: 'abajo',
         pilas.simbolos.c: 'click',
         }
         
@@ -45,18 +44,19 @@ class personaje(pilasengine.actores.Actor):
         mi_control = pilas.control.Control(teclas)
         
         # Propiedades del Personaje
-        self.y = -185
+        self.y = -210
         self.x = 0
         self.rotacion = 90
         self.radio_de_colision = 25
-        self.imagen = pilas.imagenes.cargar('src/img/personaje.png')
-        self.espejado = True
+        self.imagen = pilas.imagenes.cargar('src/img/img_soldier.png')
+        self.escala = 0.25
+        figura_personaje = pilas.fisica.Circulo(0, 0, 25, dinamica=False, sensor=False)
+        self.figura_de_colision = figura_personaje
         
         # Habilidades del Personaje
-        self.aprender('dispararconclick', municion='balitas', angulo_salida_disparo=self.rotacion, frecuencia_de_disparo = 10, control = mi_control)
+        self.aprender('dispararconclick', municion='balitas', angulo_salida_disparo=self.rotacion, frecuencia_de_disparo = 7, control = mi_control, distancia=57)
         self.aprender('moverseconelteclado', control = mi_control)
         self.aprender('rotarconmouse')
-        self.aprender('limitadoabordesdepantalla')
     
     def eliminar(self):
         self.eliminar()
@@ -64,9 +64,6 @@ class personaje(pilasengine.actores.Actor):
     #def respawn(self):
         #self.x = 0
         #self.y = 0
-    
-    def actualizar(self):
-        pass
     
 pilas.actores.vincular(personaje)
 
@@ -91,10 +88,9 @@ class movimiento_zombie (pilasengine.habilidades.Habilidad):
         self.receptor = receptor
         self.velocidad = velocidad
         pilas.tareas.siempre(0, self.mover_izq)
-        #pilas.utils.interpolar(self.receptor.figura, 'x', -500, duracion=self.velocidad)  
                 
     def mover_izq(self):
-        self.receptor.figura.x -= 5
+        self.receptor.figura.x -= self.velocidad
         
 
 pilas.habilidades.vincular(movimiento_zombie)
@@ -136,8 +132,13 @@ class zombie(pilasengine.actores.Actor):
         self.resistencia = 0
         self.x = 250
         self.y = 100
+        self.imagen = pilas.imagenes.cargar('src/img/zombie.png')
+        self.espejado = True
+        self.escala = 0.25
         self.figura = self.pilas.fisica.Circulo(0, 0, 25, dinamica=False, sensor=False)
         self.radio_de_colision = 25
+        
+        self.hit = None
         
         # Barra de vida
         self.barra_vida = self.pilas.actores.Energia()
@@ -149,6 +150,9 @@ class zombie(pilasengine.actores.Actor):
     def eliminar(self):
         self.figura.eliminar()
         self.eliminar()
+        
+    def terminar_hit(self):
+        self.hit.terminar()
             
         
     #Seguir Jugador
@@ -158,7 +162,7 @@ class zombie(pilasengine.actores.Actor):
             
     def actualizar(self):
         self.barra_vida.x = self.x
-        self.barra_vida.y = self.y + 50
+        self.barra_vida.y = self.y + 30
         self.x = self.figura.x
         self.y = self.figura.y
         
@@ -175,10 +179,10 @@ class zombie_spawn (pilasengine.actores.actor_invisible.ActorInvisible):
     def spawn(self, z):
      
         z.figura.x = 400
-        z.figura.y = pilas.azar(-100,200) 
-        z.resistencia = pilas.azar(0,75)
+        z.figura.y = pilas.azar(-140,180) 
+        z.resistencia = pilas.azar(0,60)
                 
-        velocidad = pilas.azar(7,15)    
+        velocidad = pilas.azar(2,5)    
         z.aprender("movimiento_zombie", velocidad)
         
         
@@ -190,26 +194,46 @@ class barrera (pilasengine.actores.Actor):
     
     def iniciar(self):
     
-        self.x = -275
+        self.x = -250
         self.y = 0
         self.vida = 100   
-        colisiones_barrera = pilas.fisica.Rectangulo(0, 0, 60, 500, sensor=False, dinamica=False) 
+        colisiones_barrera = pilas.fisica.Rectangulo(0, 0, 100, 500, sensor=False, dinamica=False) 
         self.figura_de_colision = colisiones_barrera
+        self.imagen = pilas.imagenes.cargar('src/img/barrier.jpg')
         
         self.barra_vida_barrera = self.pilas.actores.Energia()
         self.barra_vida_barrera.escala = 1
         self.barra_vida_barrera.x = 0
         self.barra_vida_barrera.y = 200
         
-    def actualizar(self):
-        if self.figura_de_colision.figuras_en_contacto:
-            #print(self.figura_de_colision.figuras_en_contacto)
-            #print(len(self.figura_de_colision.figuras_en_contacto))
-            #print(self.figura_de_colision.figuras_en_contacto.count('figura'))
-            pass
-        
 
 pilas.actores.vincular(barrera)
+
+# Pared Invisible Superior
+class pared_sup(pilasengine.actores.actor_invisible.ActorInvisible):
+    
+    def iniciar(self):
+        self.x = 60
+        self.y = -150
+        colision_sup = pilas.fisica.Rectangulo(0, 0, 525, 10, sensor=False, dinamica=False)
+        self.figura_de_colision = colision_sup
+        
+        
+pilas.actores.vincular(pared_sup)
+
+# Pared Invisible Inferior
+class pared_inf(pilasengine.actores.Actor):
+    
+    def iniciar(self):
+        self.x = 60
+        self.y = -150
+        colision_inf = pilas.fisica.Rectangulo(0, 0, 525, 10, sensor=False, dinamica=False)
+        self.figura_de_colision = colision_inf
+        self.imagen = pilas.imagenes.cargar('src/img/cerco_inf.png')
+        self.escala = 0.1
+        
+        
+pilas.actores.vincular(pared_inf)
 
 
 # Escena de menu principal
@@ -304,6 +328,10 @@ pilas.escenas.vincular(escena_controles)
 class escena_juego(pilasengine.escenas.Escena):
     
     def iniciar(self):
+        fondo = self.pilas.fondos.Fondo()
+        fondo.imagen = pilas.imagenes.cargar('src/img/fondo_suelo.jpg')
+        fondo.escala = 1.60
+        
         pilas.fisica.eliminar_paredes()
         
         self.contador_muertes = 0
@@ -316,6 +344,10 @@ class escena_juego(pilasengine.escenas.Escena):
         
         # Invocacion de Barrera
         self.barrera = pilas.actores.barrera()
+        
+        self.pared_sup = pilas.actores.pared_sup()
+        
+        self.pared_inf = pilas.actores.pared_inf()
         
         # Invocacion de mira
         self.mira = pilas.actores.mira()
@@ -335,19 +367,23 @@ class escena_juego(pilasengine.escenas.Escena):
         
     def hit_zombie(self, balitas, zombie):
         balitas.eliminar()
-        zombie.vida -= 100 - zombie.resistencia
+        zombie.vida -= 75 - zombie.resistencia
         zombie.barra_vida.progreso = zombie.vida
             
         if zombie.vida <= 0:
             zombie.barra_vida.eliminar()
+            
+            if zombie.hit != None:
+                zombie.terminar_hit()            
+            
             zombie.eliminar()
             self.contador_muertes = self.contador_muertes + 1
             
     def zombie_hit_tarea(self, zombie, barrera):
-        pilas.tareas.agregar(1, self.zombie_hit, zombie, barrera)
+        zombie.hit = pilas.tareas.siempre(1, self.zombie_hit, zombie, barrera)
             
     def zombie_hit(self, zombie, barrera):
-        barrera.vida -= 3
+        barrera.vida -= pilas.azar(3, 10)
         barrera.barra_vida_barrera.progreso = barrera.vida   
             
         if barrera.vida <= 0:
@@ -395,7 +431,7 @@ class escena_game_over(pilasengine.escenas.Escena):
         self.calavera.transparencia = 100
                            
     def contador_zombies_txt(self):
-        self.contador_txt = pilas.actores.Texto("Zombies muertos:")
+        self.contador_txt = pilas.actores.Texto("Zombies eliminados:")
         self.contador_txt.y = -25
         self.contador_txt.color = pilas.colores.Color(241, 0, 0, 0)
         self.contador_txt.escala = 1.50
@@ -419,6 +455,7 @@ pilas.escenas.vincular(escena_game_over)
                         
                                          
 pilas.escenas.escena_menu()
+#pilas.escenas.escena_juego()
 
 
 
