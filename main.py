@@ -35,7 +35,7 @@ class personaje(pilasengine.actores.Actor):
         pilas.simbolos.c: 'click',
         }
         
-        # Definimos el control del Personaje
+        # Definimos el control del Personajeq
         mi_control = pilas.control.Control(teclas)
         
         # Propiedades del Personaje
@@ -55,10 +55,6 @@ class personaje(pilasengine.actores.Actor):
     
     def eliminar(self):
         self.eliminar()
-    
-    #def respawn(self):
-        #self.x = 0
-        #self.y = 0
     
 pilas.actores.vincular(personaje)
 
@@ -90,36 +86,8 @@ class movimiento_zombie (pilasengine.habilidades.Habilidad):
 
 pilas.habilidades.vincular(movimiento_zombie)
     
-
-# Habilidad - Vida de Zombie con Parametros - 
-#class vida_zombie (pilasengine.habilidades.Habilidad):
-#    
-#    def iniciar(self, receptor, vida):
-#        self.receptor = receptor
-#        self.vida = vida
-#        
-#    def actualizar(self):
-#        self.receptor
-        
-        
-        
-        
-# Habilidad - Resistencia de Zombie con Parametros - 
-#class resistencia_zombie (pilasengine.habilidades.Habilidad):
-#    
-#    def iniciar(self, receptor, vida):
-#        self.receptor = receptor
-#        self.resistencia = resistencia
-#        
-#    def actualizar(self):
-#        self.receptor.resistencia = self.resistencia
-    
-
 # NPC (Zombies)
 class zombie(pilasengine.actores.Actor):
-    
-    #def __init__(self, actor):
-    #    self.actor = actor
     
     def iniciar(self):
 
@@ -149,12 +117,6 @@ class zombie(pilasengine.actores.Actor):
         self.sangre.x = x
         self.sangre.y = y
         pilas.tareas.una_vez(2, self.sangre.eliminar)
-                    
-        
-    #Seguir Jugador
-    #def seguir_jugador(self):
-    #   self.x = [self.actor.x],5
-    #   self.y = [self.actor.y],5   
             
     def actualizar(self):
         self.barra_vida.x = self.x
@@ -231,11 +193,12 @@ class pared_inf(pilasengine.actores.Actor):
         
 pilas.actores.vincular(pared_inf)
 
-
 # Escena de menu principal
 class escena_menu(pilasengine.escenas.Escena):
     
     def iniciar(self):
+
+        
         fondo = self.pilas.fondos.Fondo()
         fondo.imagen = pilas.imagenes.cargar('src/img/zombie-background.jpg')
         fondo.escala = 0.45
@@ -247,7 +210,9 @@ class escena_menu(pilasengine.escenas.Escena):
         self.boton_iniciar.x = 0
         self.boton_iniciar.y = -60
         self.boton_iniciar.transparencia = 100
-        pilas.tareas.agregar(8, self.aparece_boton)        
+        pilas.tareas.agregar(8, self.aparece_boton) 
+                
+              
         
     def titulo_menu(self):
         self.titulo = self.pilas.actores.Actor()
@@ -472,24 +437,5 @@ class escena_game_over(pilasengine.escenas.Escena):
         
         
 pilas.escenas.vincular(escena_game_over)
-                
-                        
-                                         
-#pilas.escenas.escena_menu()
-pilas.escenas.escena_juego()
-#pilas.escenas.escena_game_over(5)
-
-
-
-
-
-
-
-
-# Practicando Pilas (No son parte del proyecto)
-#mono = pilas.actores.Mono()
-#mono.x = [220]
-#mono.y = [220]
-#bomba = pilas.actores.Bomba()
-#bomba.explotar()
-#mono.aprender(pilas.habilidades.RotarConMouse, lado_seguimiento='ABAJO')
+                                                   
+pilas.escenas.escena_menu()
