@@ -14,12 +14,7 @@ class balitas(pilasengine.actores.Actor):
         self.espejado = True
         
         # Habilidades de Bala
-        self.aprender('eliminarsesisaledepantalla')    
-        self.aprender('puedeexplotar')
-       
-    def eliminar(self):
-        del self.figura_balita
-        self.eliminar()
+        self.aprender('eliminarsesisaledepantalla') 
         
     def actualizar(self):
         self.figura_balita.x = self.x
@@ -144,16 +139,17 @@ class zombie(pilasengine.actores.Actor):
         self.barra_vida = self.pilas.actores.Energia()
         self.barra_vida.escala = 0.5
         
-        # Hablilidades Zombie
-        self.aprender('puedeexplotar')
-    
-    def eliminar(self):
-        self.figura.eliminar()
-        self.eliminar()
-        
     def terminar_hit(self):
         self.hit.terminar()
-            
+        
+    def sangre(self, x, y):
+        self.sangre = pilas.actores.Actor()
+        self.sangre.imagen = pilas.imagenes.cargar('src/img/blood.png')
+        self.sangre.escala = 0.25
+        self.sangre.x = x
+        self.sangre.y = y
+        pilas.tareas.una_vez(2, self.sangre.eliminar)
+                    
         
     #Seguir Jugador
     #def seguir_jugador(self):
@@ -173,7 +169,7 @@ pilas.actores.vincular(zombie)
 class zombie_spawn (pilasengine.actores.actor_invisible.ActorInvisible):
     
     def iniciar(self):
-        self.x = 0    
+        self.x = 400
         self.y = 0
         
     def spawn(self, z):
@@ -214,7 +210,7 @@ class pared_sup(pilasengine.actores.actor_invisible.ActorInvisible):
     
     def iniciar(self):
         self.x = 60
-        self.y = -150
+        self.y = 200
         colision_sup = pilas.fisica.Rectangulo(0, 0, 525, 10, sensor=False, dinamica=False)
         self.figura_de_colision = colision_sup
         
@@ -362,7 +358,7 @@ class escena_juego(pilasengine.escenas.Escena):
         pilas.colisiones.agregar("zombie", "barrera", self.zombie_hit_tarea)
         
         # Spawn
-        pilas.tareas.siempre(2, self.spawn)
+        pilas.tareas.siempre(1, self.spawn)
         
         
     def hit_zombie(self, balitas, zombie):
@@ -374,10 +370,12 @@ class escena_juego(pilasengine.escenas.Escena):
             zombie.barra_vida.eliminar()
             
             if zombie.hit != None:
-                zombie.terminar_hit()            
-            
+                zombie.terminar_hit()   
+                            
+            zombie.sangre(zombie.x, zombie.y)           
             zombie.eliminar()
             self.contador_muertes = self.contador_muertes + 1
+             
             
     def zombie_hit_tarea(self, zombie, barrera):
         zombie.hit = pilas.tareas.siempre(1, self.zombie_hit, zombie, barrera)
@@ -390,7 +388,10 @@ class escena_juego(pilasengine.escenas.Escena):
             pilas.escenas.escena_game_over(self.contador_muertes)
         
     def spawn(self):
-                
+        tiempo_spawn = pilas.azar(1,3)
+        pilas.tareas.una_vez(tiempo_spawn, self.spawn_zombie)
+        
+    def spawn_zombie(self):
         z = pilas.actores.zombie()
         self.zombie_spawn.spawn(z)
         self.enemigos.agregar(z)
@@ -414,6 +415,7 @@ class escena_game_over(pilasengine.escenas.Escena):
         self.contador_zombies_txt()
         self.contador_zombies(self.contador_final)
         self.inicio_escena()
+        pilas.tareas.una_vez(5, self.fin_escena)
         
     def titulo_game_over(self):
         self.titulo = pilas.actores.Actor()
@@ -443,6 +445,17 @@ class escena_game_over(pilasengine.escenas.Escena):
         self.contador.color = pilas.colores.Color(0, 212, 0, 0)
         self.contador.escala = 2
         self.contador.transparencia = 100
+        
+    def boton_retry(self):
+        self.boton_retry = self.pilas.actores.Boton()
+        self.boton_retry.imagen = pilas.imagenes.cargar('src/img/boton_retry.png')
+        self.boton_retry.escala = 1
+        self.boton_retry.conectar_presionado(self.retry)
+        self.boton_retry.transparencia = 100
+        self.boton_retry.transparencia = [0], 3
+        
+    def retry(self):
+        pilas.escenas.escena_juego()
     
     def inicio_escena(self):
         self.titulo.transparencia = [0], 3
@@ -450,12 +463,21 @@ class escena_game_over(pilasengine.escenas.Escena):
         self.contador_txt.transparencia = [0], 3
         self.contador.transparencia = [0], 3
         
+    def fin_escena(self):
+        self.titulo.transparencia = [100], 3
+        self.calavera.transparencia = [100], 3
+        self.contador_txt.transparencia = [100], 3
+        self.contador.transparencia = [100], 3
+        self.boton_retry()
+        
+        
 pilas.escenas.vincular(escena_game_over)
                 
                         
                                          
-pilas.escenas.escena_menu()
-#pilas.escenas.escena_juego()
+#pilas.escenas.escena_menu()
+pilas.escenas.escena_juego()
+#pilas.escenas.escena_game_over(5)
 
 
 
