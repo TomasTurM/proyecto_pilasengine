@@ -13,7 +13,7 @@ class EscenaMenu(pilasengine.escenas.Escena):
         self.boton_iniciar = self.pilas.actores.Boton()
         self.boton_iniciar.imagen = self.pilas.imagenes.cargar('src/img/boton_iniciar.png')
         self.boton_iniciar.conectar_presionado(self.translacion_controles)
-        self.boton_iniciar.escala = 0.85
+        self.boton_iniciar.escala = 0.35
         self.boton_iniciar.x = 0
         self.boton_iniciar.y = -60
         self.boton_iniciar.transparencia = 100
@@ -22,9 +22,9 @@ class EscenaMenu(pilasengine.escenas.Escena):
     def titulo_menu(self):
         self.titulo = self.pilas.actores.Actor()
         self.titulo.imagen = self.pilas.imagenes.cargar('src/img/titulo_menu.png')
-        self.titulo.escala = 0.85
+        self.titulo.escala = 1.5
         self.titulo.y = 300
-        self.titulo.y = [75], 8
+        self.titulo.y = [85], 8
 
     def translacion_controles(self):
         self.titulo.transparencia = [100], 3
@@ -184,6 +184,7 @@ class EscenaGameOver(pilasengine.escenas.Escena):
         self.titulo.imagen = self.pilas.imagenes.cargar('src/img/titulo_game_over.png')
         self.titulo.escala = 1
         self.titulo.y = 50
+        self.titulo.x = 10
         self.titulo.transparencia = 100
 
     def calavera(self):
@@ -211,7 +212,7 @@ class EscenaGameOver(pilasengine.escenas.Escena):
     def boton_retry(self):
         self.boton_retry = self.pilas.actores.Boton()
         self.boton_retry.imagen = self.pilas.imagenes.cargar('src/img/boton_retry.png')
-        self.boton_retry.escala = 1
+        self.boton_retry.escala = 0.25
         self.boton_retry.conectar_presionado(self.retry)
         self.boton_retry.transparencia = 100
         self.boton_retry.transparencia = [0], 3
