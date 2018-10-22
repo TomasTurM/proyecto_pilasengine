@@ -138,7 +138,7 @@ class EscenaJuego(pilasengine.escenas.Escena):
                 zombie.terminar_hit()
 
             zombie.sangre(zombie.x, zombie.y)
-            zombie.eliminar()
+            pilas.eliminar_colisiones_con_actor(zombie)
             self.contador_muertes = self.contador_muertes + 1
 
     def zombie_hit_tarea(self, zombie, barrera):

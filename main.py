@@ -38,4 +38,4 @@ pilas.escenas.vincular(EscenaJuego)
 
 pilas.escenas.vincular(EscenaGameOver)
 
-pilas.escenas.EscenaMenu()
+pilas.escenas.EscenaJuego()
