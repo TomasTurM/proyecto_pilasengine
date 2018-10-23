@@ -32,12 +32,16 @@ class Zombie(pilasengine.actores.Actor):
         self.sangre.y = y
         self.pilas.tareas.una_vez(2, self.sangre.eliminar)
 
+    def parar_figura(self):
+        self.figura.x = 0
+        self.figura.y = 0
+
     def actualizar(self):
         self.barra_vida.x = self.x
         self.barra_vida.y = self.y + 30
         self.x = self.figura.x
         self.y = self.figura.y
-
+ 
 
 # Habilidad - Movimiento de Zombie con Parametros -
 class MovimientoZombie(pilasengine.habilidades.Habilidad):
