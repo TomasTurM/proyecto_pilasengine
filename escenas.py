@@ -133,11 +133,11 @@ class EscenaJuego(pilasengine.escenas.Escena):
 
         if zombie.vida <= 0:
             zombie.barra_vida.eliminar()
-            zombie.sangre(zombie.x, zombie.y)
-            zombie.parar_figura()
+            zombie.sangre()
             """
             error: TypeError("'Actor' object is not callable",)
             """
+            zombie.parar_figura()
             self.contador_muertes = self.contador_muertes + 1
     """
             if zombie.hit is not None:

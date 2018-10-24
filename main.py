@@ -5,7 +5,7 @@ import pilasengine
 
 from balas import Balitas
 from personajes import Personaje, Mira
-from npcs import MovimientoZombie, Zombie, ZombieSpawn
+from npcs import MovimientoZombie, Sangre, Zombie, ZombieSpawn
 from objetos import Barrera, ParedSup, ParedInf
 from escenas import EscenaMenu, EscenaControles, EscenaJuego, EscenaGameOver
 
@@ -13,6 +13,8 @@ from escenas import EscenaMenu, EscenaControles, EscenaJuego, EscenaGameOver
 pilas = pilasengine.iniciar()
 
 pilas.actores.vincular(Balitas)
+
+pilas.actores.vincular(Sangre)
 
 pilas.actores.vincular(Personaje)
 

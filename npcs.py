@@ -1,6 +1,17 @@
 # -*- coding: UTF-8 -*-
 import pilasengine
 
+
+# Sangre
+class Sangre(pilasengine.actores.Actor):
+
+    def iniciar(self, x, y):
+        self.x = x
+        self.y = y
+        self.imagen = self.pilas.imagenes.cargar('src/img/blood.png')
+        self.escala = 0.25
+        self.pilas.tareas.una_vez(2, self.eliminar)
+
 # NPC (Zombies)
 class Zombie(pilasengine.actores.Actor):
 
@@ -24,17 +35,25 @@ class Zombie(pilasengine.actores.Actor):
     def terminar_hit(self):
         self.hit.terminar()
 
-    def sangre(self, x, y):
-        self.sangre = self.pilas.actores.Actor()
+    def sangre(self):
+        sangre_x = self.x
+        sangre_y = self.y
+        self.sangre = self.pilas.actores.Sangre(sangre_x, sangre_y)
+        """
         self.sangre.imagen = self.pilas.imagenes.cargar('src/img/blood.png')
         self.sangre.escala = 0.25
-        self.sangre.x = x
-        self.sangre.y = y
+        self.sangre.x = sangre_x
+        self.sangre.y = sangre_y
         self.pilas.tareas.una_vez(2, self.sangre.eliminar)
+        """
 
     def parar_figura(self):
-        self.figura.x = 0
+        self.eliminar_habilidades()
+        self.eliminar_comportamientos()
+        self.eliminar_figura(figura)
+        self.figura.x = -300
         self.figura.y = 0
+        self.eliminar()
 
     def actualizar(self):
         self.barra_vida.x = self.x
