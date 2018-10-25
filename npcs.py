@@ -35,24 +35,11 @@ class Zombie(pilasengine.actores.Actor):
     def terminar_hit(self):
         self.hit.terminar()
 
-    def sangre(self):
-        sangre_x = self.x
-        sangre_y = self.y
-        self.sangre = self.pilas.actores.Sangre(sangre_x, sangre_y)
-        """
-        self.sangre.imagen = self.pilas.imagenes.cargar('src/img/blood.png')
-        self.sangre.escala = 0.25
-        self.sangre.x = sangre_x
-        self.sangre.y = sangre_y
-        self.pilas.tareas.una_vez(2, self.sangre.eliminar)
-        """
-
     def parar_figura(self):
         self.eliminar_habilidades()
         self.eliminar_comportamientos()
-        self.eliminar_figura(figura)
-        self.figura.x = -300
-        self.figura.y = 0
+        self.figura.x = 300
+        self.figura.y = -500
         self.eliminar()
 
     def actualizar(self):

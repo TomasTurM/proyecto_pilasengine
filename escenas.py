@@ -125,27 +125,24 @@ class EscenaJuego(pilasengine.escenas.Escena):
 
         # Spawn
         self.pilas.tareas.siempre(1, self.spawn)
+        
 
     def hit_zombie(self, balitas, zombie):
+        balitas.figura_balita.set_radius(0.1)
         balitas.eliminar()
         zombie.vida -= 75 - zombie.resistencia
         zombie.barra_vida.progreso = zombie.vida        
 
         if zombie.vida <= 0:
             zombie.barra_vida.eliminar()
-            zombie.sangre()
-            """
-            error: TypeError("'Actor' object is not callable",)
-            """
+            sangre_x = zombie.x
+            sangre_y = zombie.y
+            self.sangre = self.pilas.actores.Sangre(sangre_x, sangre_y)
             zombie.parar_figura()
             self.contador_muertes = self.contador_muertes + 1
-    """
-            if zombie.hit is not None:
-                zombie.terminar_hit()
-    """
 
     def zombie_hit_tarea(self, zombie, barrera):
-        zombie.hit = self.pilas.tareas.siempre(1, self.zombie_hit, zombie, barrera)
+        zombie.hit = self.pilas.tareas.una_vez(0.5, self.zombie_hit, zombie, barrera)
 
     def zombie_hit(self, zombie, barrera):
         barrera.vida -= self.pilas.azar(3, 10)
@@ -162,8 +159,9 @@ class EscenaJuego(pilasengine.escenas.Escena):
         z = self.pilas.actores.Zombie()
         self.zombie_spawn.spawn(z)
         self.enemigos.agregar(z)
-
+        
     def auto_ataque(self, balitas, barrera):
+        balitas.figura_balita.set_radius(0.1)
         balitas.eliminar()
         barrera.vida -= 1
         barrera.barra_vida_barrera.progreso = barrera.vida
